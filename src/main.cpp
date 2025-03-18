@@ -7,8 +7,7 @@ namespace po = boost::program_options;
 
 bool isValidColorTarget(const std::string colorTarget)
 {
-    if( colorTarget == "UNDEFINED"){return true;}
-    else if( colorTarget == "R32G32B32A32_FLOAT"){return true;}
+    if( colorTarget == "R32G32B32A32_FLOAT"){return true;}
     else if( colorTarget == "R32G32B32A32_UINT"){return true;}
     else if( colorTarget == "R32G32B32A32_SINT"){return true;}
     else if( colorTarget == "R32G32B32_FLOAT"){return true;}
@@ -214,17 +213,25 @@ int main(int argc, char**argv)
     {
         output<<"#depth "<<depthTarget<<'\n';
     }
-    output<< boost::endian::native_to_big(attributeNumber);
-    output<<"vertex:"<<static_cast<uint32_t>(vertexData.size());
+    auto aNumberBigEnd = boost::endian::native_to_big(attributeNumber);
+    output.write(reinterpret_cast<char*>(&aNumberBigEnd), sizeof(aNumberBigEnd));
+    auto vertexSize =  static_cast<uint32_t>(vertexData.size());
+    boost::endian::native_to_big_inplace(vertexSize);
+    output<<"vertex:";
+    output.write(reinterpret_cast<char*>(&vertexSize), sizeof(vertexSize));
     for (auto& vertexByte : vertexData)
     {
         output << vertexByte;
     }
-    output<<"fragment:"<<static_cast<uint32_t>(fragmentData.size());
+    auto fragmentSize = static_cast<uint32_t>(fragmentData.size());
+    boost::endian::native_to_big_inplace(fragmentSize);
+    output<<"fragment:";
+    output.write(reinterpret_cast<char*>(&fragmentSize), sizeof(fragmentSize));
     for (auto& fragmentByte : fragmentData)
     {
         output << fragmentByte;
     }
+    output.close();
 
     return 0;
 }
