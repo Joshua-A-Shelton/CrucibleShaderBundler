@@ -213,10 +213,10 @@ int main(int argc, char**argv)
     {
         output<<"#depth "<<depthTarget<<'\n';
     }
-    auto aNumberBigEnd = boost::endian::native_to_big(attributeNumber);
+    auto aNumberBigEnd = boost::endian::little_to_native(attributeNumber);
     output.write(reinterpret_cast<char*>(&aNumberBigEnd), sizeof(aNumberBigEnd));
     auto vertexSize =  static_cast<uint32_t>(vertexData.size());
-    boost::endian::native_to_big_inplace(vertexSize);
+    boost::endian::little_to_native_inplace(vertexSize);
     output<<"vertex:";
     output.write(reinterpret_cast<char*>(&vertexSize), sizeof(vertexSize));
     for (auto& vertexByte : vertexData)
@@ -224,7 +224,7 @@ int main(int argc, char**argv)
         output << vertexByte;
     }
     auto fragmentSize = static_cast<uint32_t>(fragmentData.size());
-    boost::endian::native_to_big_inplace(fragmentSize);
+    boost::endian::little_to_native_inplace(fragmentSize);
     output<<"fragment:";
     output.write(reinterpret_cast<char*>(&fragmentSize), sizeof(fragmentSize));
     for (auto& fragmentByte : fragmentData)
